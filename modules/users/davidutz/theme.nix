@@ -44,6 +44,17 @@
   flake.homeModules.davidutzDesktop =
     { pkgs, ... }:
     {
+      # The light variant is the white cursor, which stays visible on the dark palette.
+      # `gtk.enable` fills in `gtk.cursorTheme`. Hyprland reads the same name and size
+      # for its session env vars, see desktop/hyprland/hyprland.nix.
+      home.pointerCursor = {
+        enable = true;
+        name = "phinger-cursors-light";
+        package = pkgs.phinger-cursors;
+        size = 32;
+        gtk.enable = true;
+      };
+
       # colorScheme sets org.gnome.desktop.interface color-scheme = prefer-dark, which
       # the GTK portal hands to libadwaita, Firefox/Zen, Chromium and Electron apps.
       gtk = {
