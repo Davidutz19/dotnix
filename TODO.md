@@ -8,9 +8,7 @@ Open work only. The layout and commands are in README.md.
       anything that lost its settings to `davidutz.persist` in its file.
 - [ ] Then delete the old home subvolume, which still holds everything:
       mount the top level (README.md, Impermanence) and run
-      `sudo btrfs subvolume delete /mnt/@home`. Copy anything you want from it first,
-      such as `~/dotfiles` and `~/home-sweet-home` (unpushed commits) or
-      `~/.local/share/Trash`'s old contents.
+      `sudo btrfs subvolume delete /mnt/@home`. Copy anything you want from it first.
 - [ ] Snapshots of the data disk subvolumes (`personal`, `work`, `Games`) with snapper:
       https://wiki.nixos.org/wiki/Snapper. `/` doesn't need them, and `/persist`
       could get one too.
@@ -32,7 +30,7 @@ Open work only. The layout and commands are in README.md.
 - [ ] Once CachyOS is gone: delete `/boot/limine*`, the CachyOS kernels in `/boot`,
       and the `@cachyos` subvolume.
 
-## Still in `~/dotfiles`
+## Still in `~/personal/dotfiles`
 
 - [ ] ssh-agent with the 30-minute key timeout: `services.ssh-agent.enable = true;`
       (Mochi already provides `SSH_ASKPASS`).
