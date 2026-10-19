@@ -4,5 +4,6 @@
     { pkgs, ... }:
     {
       home.packages = [ pkgs.element-desktop ];
+      davidutz.persist.directories = [ ".config/Element" ];
     };
 }

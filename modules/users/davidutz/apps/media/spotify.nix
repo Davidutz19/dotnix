@@ -4,6 +4,7 @@
     { pkgs, ... }:
     {
       home.packages = [ pkgs.spotify ];
+      davidutz.persist.directories = [ ".config/spotify" ];
 
       wayland.windowManager.hyprland.extraConfig = ''
         hl.bind("SUPER + SHIFT + M", hl.dsp.exec_cmd("spotify"))

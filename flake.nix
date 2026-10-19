@@ -33,18 +33,27 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Agent skills and instructions, linked in by the agents profile.
-    dotagents = {
-      url = "github:DavidutzDev/dotagents";
-      flake = false;
-    };
+    # Declarative Flatpak apps and remotes (Sober).
+    nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
+
+    # Agent skills and instructions, linked in by the agents profile. It is a flake, so
+    # the Home Manager module that links them ships with the repo. It has no inputs of
+    # its own, so there is nothing to follow.
+    dotagents.url = "github:DavidutzDev/dotagents";
+
+    # League of Legends through Darling. It pins its own nixpkgs on purpose: the
+    # Darling build is tested against that toolchain.
+    # Temporarily on the fd-limit fix until lucannez64/darling-lol#107 is merged.
+    darling-lol.url = "github:DavidutzDev/darling-lol/fix/darlingserver-fd-limit";
   };
 
-  outputs = inputs@{
-    flake-parts,
-    home-manager,
-    import-tree,
-    nixpkgs,
-    ...
-  }: flake-parts.lib.mkFlake { inherit inputs; } (import-tree ./modules);
+  outputs =
+    inputs@{
+      flake-parts,
+      home-manager,
+      import-tree,
+      nixpkgs,
+      ...
+    }:
+    flake-parts.lib.mkFlake { inherit inputs; } (import-tree ./modules);
 }

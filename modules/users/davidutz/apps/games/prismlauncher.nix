@@ -4,5 +4,6 @@
     { pkgs, ... }:
     {
       home.packages = [ pkgs.prismlauncher ];
+      davidutz.persist.directories = [ ".local/share/PrismLauncher" ];
     };
 }

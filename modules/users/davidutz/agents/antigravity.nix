@@ -4,5 +4,6 @@
     { pkgs, ... }:
     {
       home.packages = [ pkgs.antigravity-cli ];
+      davidutz.persist.directories = [ ".gemini" ];
     };
 }

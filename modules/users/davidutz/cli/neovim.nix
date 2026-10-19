@@ -20,5 +20,12 @@
         vi = "nvim";
         vim = "nvim";
       };
+
+      # The LazyVim config itself, plus its plugins, undo history and sessions.
+      davidutz.persist.directories = [
+        ".config/nvim"
+        ".local/share/nvim"
+        ".local/state/nvim"
+      ];
     };
 }

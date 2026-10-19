@@ -1,10 +1,11 @@
-# `/` is empty after every boot. Requirements on the host's disk layout:
+# `/` is empty after every boot, /home included. Requirements on the host's disk layout:
 #   - `/` is a btrfs subvolume (fileSystems."/" has a subvol= option)
-#   - /persist is a separate filesystem or subvolume
+#   - /persist and /nix are separate filesystems or subvolumes
+#   - /home is not, so it is wiped with `/`
 # The initrd moves the old root subvolume to old_roots/ and creates an empty one.
-# This module also lists the system state that survives, stored under /persist and
-# bind-mounted back. /home and /nix should be their own subvolumes, so nothing
-# inside them needs listing here.
+# This module lists the system state that survives, stored under /persist and
+# bind-mounted back. The state kept in your home is listed by the files under
+# users/davidutz/ (`davidutz.persist`, see users/davidutz/persist.nix).
 #
 # Something lost its settings after a reboot? Find where it writes
 # (`sudo find / -xdev -newer /etc/os-release -not -path '/proc/*'`) and add the path.
@@ -34,6 +35,10 @@
         {
           assertion = root.fsType == "btrfs" && subvolOption != null;
           message = "impermanence: `/` must be a btrfs subvolume (subvol= in its mount options).";
+        }
+        {
+          assertion = !(config.fileSystems ? "/home");
+          message = "impermanence: /home must be part of `/`. List the home state to keep in davidutz.persist instead.";
         }
       ];
 

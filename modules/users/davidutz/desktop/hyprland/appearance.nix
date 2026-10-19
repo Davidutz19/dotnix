@@ -51,6 +51,8 @@
             force_default_wallpaper = -1,
             disable_hyprland_logo = false,
             initial_workspace_tracking = 0,
+            -- A new lock screen takes over from one that crashed (Mochi's lock).
+            allow_session_lock_restore = true,
           },
         })
 

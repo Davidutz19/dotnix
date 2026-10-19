@@ -1,142 +1,135 @@
+# Mochi, the desktop shell: bar, launcher, notifications, OSD, lock screen and power
+# menu, from the `mochi` flake input.
 { inputs, ... }:
 {
-  # Required System capabilities otherwise polkit fails
+  # Recording (the capture module) goes through gpu-screen-recorder's setcap wrapper;
+  # without it the polkit request for capture rights fails.
   flake.nixosModules.davidutz.programs.gpu-screen-recorder.enable = true;
+  # The lock screen checks the password with this PAM service; Mochi refuses
+  # to lock without it.
+  flake.nixosModules.davidutz.security.pam.services.mochi = { };
 
   flake.homeModules.davidutzDesktop =
-    { config, ... }:
-    let
-      c =config.davidutz.theme.colors;
-    in
+    { pkgs, ... }:
     {
       imports = [ inputs.mochi.homeModules.default ];
+
+      # For files dropped on the island: ffmpeg converts videos and sound,
+      # vtracer traces images into SVG.
+      home.packages = [
+        pkgs.ffmpeg
+        pkgs.vtracer
+      ];
 
       programs.mochi = {
         enable = true;
 
+        # The latest release, already built, so the switch compiles nothing.
+        # `nix flake update mochi` moves it to the newest release.
+        package = inputs.mochi.packages.${pkgs.stdenv.hostPlatform.system}.mochi-bin;
+
+        # Mochi asks for every password on the island: polkit's admin prompts in
+        # place of hyprpolkitagent, which this turns off, and sudo -A and ssh
+        # through SUDO_ASKPASS and SSH_ASKPASS. Both need "auth" in modules.
+        polkitAgent.enable = true;
+        askpass.enable = true;
+
         settings = {
+          bento.i_really_understand_that_bento_can_harm_and_contain_malicious_content = true;
+          bubbles.stack = true;
+          island.notices = "focus";
+          module = {
+            audio.max_volume = 200;
+            clock = {
+              day_progress = "ring";
+              zones = [
+                "Europe/London"
+                "America/New_York"
+                "Asia/Tokyo"
+                "Europe/Brussels"
+              ];
+            };
+            idle.hover = [
+              "workspaces"
+              "show"
+            ];
+            performance = {
+              cpu = {
+                critical = 95;
+                notice = 85;
+              };
+              temperature = {
+                critical = 90;
+                notice = 80;
+              };
+            };
+            tray.pinned = [ "discord" ];
+            weather.place = "Liege, Belgium";
+          };
           modules = [
             "idle"
             "osd"
             "workspaces"
             "media"
+            "audio"
             "notifications"
             "launcher"
-            "hub"
+            "control-center"
             "power"
+            "lock"
+            "auth"
             "capture"
             "share"
             "clipboard"
-            "audio"
             "tray"
             "network"
             "bluetooth"
             "battery"
+            "brightness"
+            "privacy"
+            "nightlight"
+            "drop"
             "performance"
             "widgets"
             "notes"
             "emoji"
             "colors"
+            "settings"
+            "tour"
+            "updater"
+            "clock"
+            "weather"
+            "timer"
           ];
-
-          # Notifications, the volume and every other notice show only on the focused
-          # monitor; the other one keeps the idle island.
-          island.notices = "focus";
-
-          # Each area shows one bubble, the most important; news comes to the front.
-          bubbles = {
-            stack = true;
-            news_ms = 4000;
-          };
-
-          module = {
-            # Nothing answers logind's lock signal (no hypridle), so run the locker directly.
-            power.lock = [ "hyprlock" ];
-
-            # The mixer's sliders and `mochi ipc audio volume` go to 200%; the OSD's bar follows.
-            audio.max_volume = 200;
-
-            # Apps with a bubble of their own next to the tray's; `mochi ipc tray list` shows ids.
-            tray.pinned = [ "discord" ];
-
-            # A notice once a reading stays over `notice` for `sustain_seconds`, naming the
-            # busiest process; a red bubble while it stays over `critical`. 0 turns one off.
-            performance = {
-              sustain_seconds = 10;
-              cpu = { notice = 85; critical = 95; };
-              memory = { notice = 85; critical = 95; };
-              gpu = { notice = 95; critical = 0; };
-              temperature = { notice = 80; critical = 90; };
-            };
-
-            # No battery on this desktop: it stays quiet until there is one.
-            battery = {
-              notices = [ 80 50 20 10 ];
-              warning = 50;
-              critical = 10;
-            };
-
-            # The launcher's providers are built in: apps, `=` calculator (plain math
-            # works too), `>` commands, `/` files, web searches (`!w`, `!g`, `!gh`, `!yt`,
-            # `!nix`, `!wiki`), `:` emoji and `#` colors.
-
-            # Share a switchable copy, at 60 fps and the screen's own size, by default.
-            share = {
-              switchable = true;
-              framerate = 60;
-              resolution = "native";
-            };
-          };
         };
-
-        # Where the widgets start. `mochi ipc widgets edit` (SUPER + SHIFT + W) moves them;
-        # a rebuild only puts this back when it changes, so drags survive. To keep
-        # an arrangement, "Copy as Nix" in edit mode and paste it here.
-        widgets =
-          let
-            # Grid cells are 16 px: a 1920 × 1080 screen is 120 × 67 of them.
-            widget = id: module: widget: output: anchor: x: y: width: height: settings: {
-              inherit id module widget output anchor x y width height settings;
-            };
-          in
-          [
-            # DP-3: time and plans on the left, music at the bottom.
-            (widget "w1" "widgets" "clock" "DP-3" "top-left" 2 4 16 8 { })
-            (widget "w2" "widgets" "calendar" "DP-3" "top-left" 2 13 16 15 { })
-            (widget "w3" "notes" "todo" "DP-3" "top-left" 19 4 16 14 { })
-            (widget "w4" "notes" "note" "DP-3" "top-left" 19 19 16 9 { })
-            (widget "w5" "media" "now-playing" "DP-3" "bottom-left" 2 (-3) 24 8 { })
-            # HDMI-A-1: a clock with seconds and the machine's readings.
-            (widget "w6" "widgets" "clock" "HDMI-A-1" "top-right" (-2) 4 16 8 { seconds = true; })
-            (widget "w7" "performance" "graphs" "HDMI-A-1" "top-right" (-2) 13 18 14 { })
-          ];
-
         theme = {
-          colors = {
-            background = "#f5${c.crust}";
-            surface = "#${c.base}";
-            raised = "#${c.surface0}";
-            highlight = "#${c.surface1}";
-            foreground = "#${c.text}";
-            muted = "#${c.overlay1}";
-            accent = "#${c.lavender}";
-            on_accent = "#${c.crust}";
-            danger = "#${c.red}";
-            success = "#${c.green}";
-          };
-          layout.mode = "island";
+          preset = "catppuccin";
           text.family = "JetBrainsMono Nerd Font";
         };
       };
 
+      # Widget layouts and settings changed live, then the clipboard history, notes,
+      # reminders and notification history.
+      davidutz.persist.directories = [
+        ".config/mochi"
+        ".local/state/mochi"
+      ];
+
       wayland.windowManager.hyprland.extraConfig = ''
+        -- Mochi's lock screen. Locking also makes sudo, the SSH keys, polkit and
+        -- the keyring forget their passwords (the auth module).
+        hl.bind("SUPER + L", hl.dsp.exec_cmd("mochi ipc lock lock"))
         hl.bind("SUPER + space", hl.dsp.exec_cmd("mochi ipc launcher toggle"))
         hl.bind("SUPER + C", hl.dsp.exec_cmd("mochi ipc hub toggle"))
         hl.bind("SUPER + N", hl.dsp.exec_cmd("mochi ipc notifications history"))
         hl.bind("SUPER + V", hl.dsp.exec_cmd("mochi ipc clipboard toggle"))
         hl.bind("SUPER + A", hl.dsp.exec_cmd("mochi ipc audio toggle"))
+        -- Mutes the default microphone, or unmutes it; the OSD shows which.
+        hl.bind("SUPER + Backspace", hl.dsp.exec_cmd("mochi ipc audio mute input"), { locked = true })
         hl.bind("SUPER + Y", hl.dsp.exec_cmd("mochi ipc tray toggle"))
         hl.bind("SUPER + I", hl.dsp.exec_cmd("mochi ipc hub open performance/page"))
+        -- Every option, changed live; Copy gives them back as Nix for this file.
+        hl.bind("SUPER + SHIFT + comma", hl.dsp.exec_cmd("mochi ipc settings toggle"))
         hl.bind("SUPER + SHIFT + N", hl.dsp.exec_cmd("mochi ipc notifications dnd toggle"))
 
         -- The emoji grid, and a color picked from the screen.

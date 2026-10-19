@@ -5,7 +5,14 @@
   flake.nixosModules.desktop-btwHardware = { lib, modulesPath, ... }: {
     imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
-    boot.initrd.availableKernelModules = [ "nvme" "xhci_pci" "ahci" "usbhid" "usb_storage" "sd_mod" ];
+    boot.initrd.availableKernelModules = [
+      "nvme"
+      "xhci_pci"
+      "ahci"
+      "usbhid"
+      "usb_storage"
+      "sd_mod"
+    ];
     boot.kernelModules = [ "kvm-amd" ];
 
     # sda and sdb are Windows NTFS disks. The Windows VM uses sda as a raw disk.

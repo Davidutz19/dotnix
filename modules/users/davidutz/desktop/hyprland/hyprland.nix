@@ -44,7 +44,5 @@
           hl.env("QT_WAYLAND_DISABLE_WINDOWDECORATION", "1")
         '';
       };
-
-      services.hyprpolkitagent.enable = true;
     };
 }

@@ -25,5 +25,12 @@
     };
 
     programs.nix-your-shell.enable = true;
+
+    # zoxide's ranking, direnv's allow list, atuin's history and sync key.
+    davidutz.persist.directories = [
+      ".local/share/zoxide"
+      ".local/share/direnv"
+      ".local/share/atuin"
+    ];
   };
 }

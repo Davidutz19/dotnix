@@ -1,5 +1,6 @@
-# Machine side of the Hyprland desktop: compositor, session, lock screen PAM,
-# portals, keyring, fonts. Import it on hosts that have a screen.
+# Machine side of the Hyprland desktop: compositor, session, portals,
+# keyring, fonts. Import it on hosts that have a screen. The PAM service of
+# Mochi's lock screen is in modules/users/davidutz/desktop/mochi.nix.
 # The user's Hyprland config is in modules/users/davidutz/desktop/hyprland/.
 {
   flake.nixosModules.hyprland = { pkgs, ... }: {
@@ -8,7 +9,6 @@
       withUWSM = true;
       xwayland.enable = true;
     };
-    programs.hyprlock.enable = true; # also installs the PAM service hyprlock needs
 
     xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
     services.gnome.gnome-keyring.enable = true;

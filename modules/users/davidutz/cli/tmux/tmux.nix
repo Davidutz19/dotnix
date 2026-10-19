@@ -37,7 +37,7 @@
           # Not keyMode = "vi": that also switches the command prompt (status-keys).
           setw -g mode-keys vi
           bind -T copy-mode-vi v send-keys -X begin-selection
-          bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel 'xclip -in -selection clipboard'
+          bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel 'wl-copy'
           bind v copy-mode
 
           # vim-like pane switching

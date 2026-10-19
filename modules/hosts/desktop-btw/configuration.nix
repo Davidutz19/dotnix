@@ -1,5 +1,4 @@
-# desktop-btw: the CachyOS machine, described for NixOS. Still named test-vm until
-# the rename.
+# desktop-btw: the main desktop. Hardware is in hardware.nix, disks in disko.nix.
 { self, ... }: {
   flake.nixosModules.desktop-btwConfiguration =
     {
@@ -80,6 +79,13 @@
 
       networking.firewall.allowedTCPPorts = [ 25567 ];
 
+      # Sinkhole BattlEye hosts via /etc/hosts.
+      networking.hosts."0.0.0.0" = [
+        "paradise-s1.battleye.com"
+        "test-s1.battleye.com"
+        "paradiseenhanced-s1.battleye.com"
+      ];
+
       # --- peripherals ---
 
       hardware.bluetooth.enable = true;
@@ -114,6 +120,13 @@
           hl.workspace_rule({ workspace = tostring(ws), monitor = "DP-3", default = true })
         end
         hl.workspace_rule({ workspace = "10", monitor = "HDMI-A-1", default = true, layout = "scrolling" })
+
+        -- Wine takes the X primary output as the Windows primary display. With none set it
+        -- picks HDMI-A-1, and fullscreen games on DP-3 then trap the X pointer on the left
+        -- monitor (The Sims 4 ignored the mouse). XWayland can start after this hook, so retry.
+        hl.on("hyprland.start", function()
+          hl.exec_cmd("sh -c 'for i in $(seq 20); do ${pkgs.xrandr}/bin/xrandr --output DP-3 --primary && exit; sleep 0.5; done'")
+        end)
 
         hl.env("GBM_BACKEND", "nvidia-drm")
         hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")

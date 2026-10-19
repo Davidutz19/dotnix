@@ -4,5 +4,6 @@
     { pkgs, ... }:
     {
       home.packages = [ pkgs.obsidian ];
+      davidutz.persist.directories = [ ".config/obsidian" ];
     };
 }

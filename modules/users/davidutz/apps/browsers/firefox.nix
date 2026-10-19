@@ -1,3 +1,6 @@
 {
-  flake.homeModules.davidutzDesktop.programs.firefox.enable = true;
+  flake.homeModules.davidutzDesktop = {
+    programs.firefox.enable = true;
+    davidutz.persist.directories = [ ".config/mozilla" ];
+  };
 }

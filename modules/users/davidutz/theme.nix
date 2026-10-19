@@ -1,6 +1,6 @@
 # One colour palette for everything (Catppuccin Mocha), plus GTK and Qt.
 #
-# Starship, Hyprland, ghostty, hyprlock and Mochi read their colours from
+# Starship, Hyprland, ghostty and Mochi read their colours from
 # `davidutz.theme.colors`, so switching the palette here switches all of them.
 # The palette is in the base profile, so the terminal setup has it without a desktop.
 {

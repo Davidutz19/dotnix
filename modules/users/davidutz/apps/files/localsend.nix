@@ -1,4 +1,4 @@
-# Needs its port open on the host to receive (TODO.md, section 6).
+# Needs its port open on the host to receive (TODO.md, Apps).
 {
   flake.homeModules.davidutzDesktop =
     { pkgs, ... }:

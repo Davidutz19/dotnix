@@ -3,5 +3,6 @@
     { pkgs, ... }:
     {
       home.packages = [ pkgs.libreoffice ];
+      davidutz.persist.directories = [ ".config/libreoffice" ];
     };
 }

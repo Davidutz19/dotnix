@@ -1,22 +1,13 @@
-# Skills and instructions from the dotagents repo, replacing its install.sh.
-# Skills are linked one by one so ~/.claude/skills can still hold other entries
-# (claude.ai's synced/). Updates come from `nix flake update dotagents`.
-{ inputs, ... }: {
-  flake.homeModules.davidutzAgents =
-    { lib, ... }:
-    let
-      src = inputs.dotagents;
-      skills = lib.filterAttrs (_: type: type == "directory") (builtins.readDir "${src}/skills");
-    in
-    {
-      home.file =
-        lib.mapAttrs' (
-          name: _: lib.nameValuePair ".claude/skills/${name}" { source = "${src}/skills/${name}"; }
-        ) skills
-        // {
-          ".claude/CLAUDE.md".source = "${src}/claude/CLAUDE.md";
-          ".claude/RTK.md".source = "${src}/claude/RTK.md";
-          ".claude/unslop.md".source = "${src}/skills/unslop/SKILL.md";
-        };
-    };
+# Skills and instructions from the dotagents repo. The repo ships the Home Manager
+# module that links them, so this file only imports it and sets the harnesses this
+# machine runs. Updates come from `nix flake update dotagents`.
+{ inputs, ... }:
+{
+  flake.homeModules.davidutzAgents = {
+    imports = [ inputs.dotagents.homeModules.default ];
+
+    # opencode is not installed here, and enabling it would create
+    # ~/.config/opencode for nothing.
+    dotagents.opencode.enable = false;
+  };
 }

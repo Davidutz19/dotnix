@@ -90,12 +90,16 @@
     {
       imports = [ inputs.zen-browser.homeModules.beta ];
 
+      davidutz.persist.directories = [ ".config/zen" ];
+
       wayland.windowManager.hyprland.extraConfig = ''
         hl.bind("SUPER + B", hl.dsp.exec_cmd("zen-beta"))
       '';
 
       programs.zen-browser = {
         enable = true;
+        # Zen is the xdg-open default for http(s) and HTML.
+        setAsDefaultBrowser = true;
         policies = {
           DisableTelemetry = true;
           DisableAppUpdate = true;

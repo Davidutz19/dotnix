@@ -1,6 +1,6 @@
 # Disk layout of desktop-btw. The boot-time wipe of `/` is in system/impermanence.nix.
 #
-#   system  Phison E12 512G   ESP + btrfs:  @ (/, wiped every boot)  @nix  @persist  @home
+#   system  Phison E12 512G   ESP + btrfs:  @ (/ and /home, wiped every boot)  @nix  @persist
 #   data    WD SN7100 2TB     one btrfs:    top level at /mnt/bulkfast, each former
 #                                           folder is now a subvolume with the same name
 #
@@ -59,10 +59,6 @@ in
                 };
                 "@persist" = {
                   mountpoint = "/persist";
-                  mountOptions = btrfsOpts;
-                };
-                "@home" = {
-                  mountpoint = "/home";
                   mountOptions = btrfsOpts;
                 };
               };

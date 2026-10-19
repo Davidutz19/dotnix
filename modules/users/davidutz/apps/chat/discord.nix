@@ -5,6 +5,7 @@
     { pkgs, ... }:
     {
       home.packages = [ pkgs.discord ];
+      davidutz.persist.directories = [ ".config/discord" ];
 
       # WebRTCPipeWireCapturer is what makes screen sharing work on Wayland.
       wayland.windowManager.hyprland.extraConfig = ''
