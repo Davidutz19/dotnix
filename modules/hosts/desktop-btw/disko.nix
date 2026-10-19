@@ -16,11 +16,13 @@ let
     "compress=zstd:1"
     "noatime"
   ];
-  # Data mounts must not stop boot if the disk is missing.
+  # Data mounts must not stop boot if the disk is missing. x-gvfs-hide keeps them out
+  # of Nautilus's drive list; ~/personal and ~/work are bookmarks there instead.
   dataOpts = [
     "compress=zstd"
     "noatime"
     "nofail"
+    "x-gvfs-hide"
   ];
 in
 {

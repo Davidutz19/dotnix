@@ -90,6 +90,8 @@
 
       preservation.enable = true;
       preservation.preserveAt."/persist" = {
+        # Without it, Nautilus and the file pickers list every bind mount as a drive.
+        commonMountOptions = [ "x-gvfs-hide" ];
         files = [
           # Symlink so systemd-machine-id-commit can write through it (see below).
           # The target must exist: for an empty file systemd generates an id and
