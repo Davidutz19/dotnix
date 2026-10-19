@@ -1,4 +1,4 @@
-# One colour palette for everything (Catppuccin Mocha), plus GTK, icons and Qt.
+# One colour palette for everything (Catppuccin Mocha), plus GTK, icons, Qt and the boot menu.
 #
 # Starship, Hyprland, ghostty, Mochi and GTK read their colours from
 # `davidutz.theme.colors`, so switching the palette here switches all of them.
@@ -37,6 +37,35 @@
           base = "1e1e2e";
           mantle = "181825";
           crust = "11111b";
+        };
+      };
+    };
+
+  # The boot menu (Limine, system/boot.nix), in the same palette. Does nothing on
+  # hosts that boot with something else.
+  flake.nixosModules.davidutz =
+    { config, ... }:
+    let
+      c = config.hm.davidutz.theme.colors;
+    in
+    {
+      boot.loader.limine.style = {
+        wallpapers = [ ./desktop/wallpapers/images/seaside-sunset.jpg ];
+        wallpaperStyle = "stretched";
+        backdrop = c.crust;
+        interface = {
+          branding = config.networking.hostName;
+          brandingColor = c.lavender;
+          helpColor = c.overlay1;
+        };
+        graphicalTerminal = {
+          # Catppuccin's terminal order: black, red, green, brown, blue, magenta, cyan, gray.
+          palette = "${c.surface1};${c.red};${c.green};${c.yellow};${c.blue};${c.pink};${c.teal};${c.subtext0}";
+          brightPalette = "${c.surface2};${c.red};${c.green};${c.yellow};${c.blue};${c.pink};${c.teal};${c.subtext1}";
+          foreground = c.text;
+          background = "33${c.base}"; # TTRRGGBB, TT is transparency: base at 20% over the wallpaper
+          brightForeground = c.lavender;
+          brightBackground = c.surface0;
         };
       };
     };

@@ -160,6 +160,13 @@
           "/etc/NetworkManager/system-connections"
           "/var/lib/NetworkManager"
         ]
+        ++ whenEnabled config.boot.loader.limine.secureBoot.enable [
+          # Secure Boot keys. Lose them and the next rebuild can't sign Limine.
+          {
+            directory = "/var/lib/sbctl";
+            mode = "0700";
+          }
+        ]
         ++ whenEnabled config.hardware.bluetooth.enable [ "/var/lib/bluetooth" ]
         ++ whenEnabled config.services.tailscale.enable [ "/var/lib/tailscale" ]
         ++ whenEnabled config.virtualisation.docker.enable [

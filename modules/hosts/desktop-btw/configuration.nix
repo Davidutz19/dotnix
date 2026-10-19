@@ -12,6 +12,7 @@
         desktop-btwHardware
         desktop-btwDisko
         impermanence
+        boot
         nix
         audio
         network
@@ -31,13 +32,13 @@
 
       # --- boot ---
 
-      # systemd-boot installs next to CachyOS's Limine on the same ESP, so both stay
-      # bootable during the move. Pick CachyOS from the firmware boot menu.
-      boot.loader.systemd-boot = {
-        enable = true;
-        configurationLimit = 10;
-      };
-      boot.loader.efi.canTouchEfiVariables = true;
+      # Windows boots from its own disk (sda) and ESP. Limine hands over to its boot
+      # manager, which the firmware checks against Microsoft's key.
+      boot.loader.limine.extraEntries = ''
+        /Windows
+          protocol: efi
+          path: guid(33940122-b476-4416-b828-22ddb977b460):/EFI/Microsoft/Boot/bootmgfw.efi
+      '';
 
       boot.initrd.systemd.enable = true;
       boot.plymouth.enable = true;
