@@ -28,7 +28,8 @@ Open work only. The layout and commands are in README.md.
       Password login over SSH is off, so without a key you can't reach the machine
       while the GPU is in the VM.
 - [ ] Once Limine with Secure Boot has booted a few times: delete systemd-boot's
-      leftovers on the ESP (`/boot/loader`, `/boot/EFI/systemd`, `/boot/EFI/nixos`) and its
+      leftovers on the ESP (`/boot/loader`, `/boot/EFI/systemd`, `/boot/EFI/nixos`, and its
+      fallback copy `/boot/EFI/BOOT/BOOTX64.EFI`) and its
       firmware entry ("Linux Boot Manager", `efibootmgr -b <num> -B`).
 
 ## Still in `~/personal/dotfiles`
