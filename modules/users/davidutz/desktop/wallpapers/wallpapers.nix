@@ -1,6 +1,8 @@
 # Wallpapers: the awww daemon, the images in ~/Pictures/Wallpapers, and the picker
 # on Mochi's island (SUPER + CTRL + W), a plugin from ~/personal/mochi-wallpaper-selector.
 # The picker sets a wallpaper with awww, saves it, and sets it again at login.
+# After `nix flake update mochi-wallpaper-selector` and a rebuild, run
+# `systemctl --user restart mochid`: Mochi keeps the picker it already compiled.
 { inputs, ... }:
 {
   flake.homeModules.davidutzDesktop =
