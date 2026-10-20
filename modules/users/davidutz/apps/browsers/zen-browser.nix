@@ -1,11 +1,6 @@
 { inputs, ... }: {
   flake.homeModules.davidutzDesktop =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
+    { pkgs, ... }:
     let
       # The overlay builds addons with our pkgs, so nixpkgs.config.allowUnfree reaches
       # unfree ones like keepa; the flake's `packages` use its own nixpkgs and refuse them.
@@ -99,67 +94,35 @@
         })
       ];
 
-      # Firefox Color (the browser extension Stylix uses for Firefox) with the palette.
-      # Stylix's mapping, with lavender (base07) wherever it uses blue (base0D), to
-      # match the accent of the rest of the desktop.
-      firefoxColor =
-        let
-          s = config.lib.stylix.colors;
-          rgb = base: {
-            r = s."${base}-rgb-r";
-            g = s."${base}-rgb-g";
-            b = s."${base}-rgb-b";
-          };
-        in
-        {
-          firstRunDone = true;
-          theme = {
-            title = "Stylix ${s.description}";
-            images.additional_backgrounds = [ "./bg-000.svg" ];
-            colors = lib.mapAttrs (_: rgb) {
-              toolbar = "base00";
-              toolbar_text = "base05";
-              frame = "base01";
-              frame_inactive = "base00";
-              tab_background_text = "base05";
-              tab_background_separator = "base07";
-              tab_line = "base07";
-              tab_loading = "base05";
-              tab_selected = "base00";
-              tab_text = "base05";
-              toolbar_field = "base02";
-              toolbar_field_text = "base05";
-              toolbar_field_border = "base00";
-              toolbar_field_border_focus = "base07";
-              toolbar_field_focus = "base00";
-              toolbar_field_highlight = "base07";
-              toolbar_field_highlight_text = "base00";
-              toolbar_field_separator = "base07";
-              toolbar_bottom_separator = "base00";
-              toolbar_vertical_separator = "base07";
-              popup = "base00";
-              popup_text = "base05";
-              popup_border = "base07";
-              popup_highlight = "base04";
-              popup_highlight_text = "base05";
-              sidebar = "base00";
-              sidebar_text = "base05";
-              sidebar_border = "base07";
-              sidebar_highlight = "base07";
-              sidebar_highlight_text = "base05";
-              button_background_active = "base04";
-              icons = "base05";
-              icons_attention = "base07";
-              ntp_background = "base00";
-              ntp_text = "base05";
-            };
-          };
-        };
+      # Catppuccin's userstyles for Stylus, set to the desktop's flavour and accent. Stylus
+      # keeps styles in its own database, which nothing outside the browser can write,
+      # so this prepares the import file and Stylus takes it once (Manage > Backup >
+      # Import). Stylus then updates the styles daily and keeps these options.
+      # Catppuccin's export is replaced in place upstream, so it is fetched when run,
+      # not pinned at build time.
+      stylusCatppuccin = pkgs.writeShellApplication {
+        name = "stylus-catppuccin";
+        runtimeInputs = [
+          pkgs.curl
+          pkgs.jq
+        ];
+        text = ''
+          out="''${1:-$HOME/Downloads/stylus-catppuccin.json}"
+          curl -fsSL https://github.com/catppuccin/userstyles/releases/download/all-userstyles-export/import.json |
+            jq 'map(if .usercssData.vars then
+                  .usercssData.vars.darkFlavor.value = "mocha"
+                  | .usercssData.vars.lightFlavor.value = "mocha"
+                  | .usercssData.vars.accentColor.value = "lavender"
+                else . end)' >"$out"
+          echo "Wrote $out. Import it in Stylus: Manage > Backup > Import."
+        '';
+      };
     in
     {
       imports = [ inputs.zen-browser.homeModules.beta ];
 
       davidutz.persist.directories = [ ".config/zen" ];
+      home.packages = [ stylusCatppuccin ];
 
       wayland.windowManager.hyprland.extraConfig = ''
         hl.bind("SUPER + SHIFT + B", hl.dsp.exec_cmd("zen-beta"))
@@ -189,13 +152,9 @@
               csgofloat
               video-downloadhelper
               aw-watcher-web
-              firefox-color
+              stylus
             ]
             ++ extra;
-          # Required before home-manager writes an extension's settings. It only
-          # replaces the settings of the extensions listed here.
-          extensions.force = true;
-          extensions.settings."FirefoxColor@mozilla.com".settings = firefoxColor;
           settings = {
             "browser.tabs.warnOnClose" = false;
           };
