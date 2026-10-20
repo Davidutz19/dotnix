@@ -1,6 +1,6 @@
 { inputs, ... }: {
   flake.homeModules.davidutzDesktop =
-    { pkgs, ... }:
+    { config, pkgs, ... }:
     let
       # The overlay builds addons with our pkgs, so nixpkgs.config.allowUnfree reaches
       # unfree ones like keepa; the flake's `packages` use its own nixpkgs and refuse them.
@@ -112,7 +112,7 @@
             jq 'map(if .usercssData.vars then
                   .usercssData.vars.darkFlavor.value = "mocha"
                   | .usercssData.vars.lightFlavor.value = "mocha"
-                  | .usercssData.vars.accentColor.value = "lavender"
+                  | .usercssData.vars.accentColor.value = "${config.davidutz.theme.roles.accent}"
                 else . end)' >"$out"
           echo "Wrote $out. Import it in Stylus: Manage > Backup > Import."
         '';

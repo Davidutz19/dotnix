@@ -11,6 +11,7 @@
     }:
     let
       c = lib.mapAttrs (_: hex: "#${hex}") config.davidutz.theme.colors;
+      ui = lib.mapAttrs (_: hex: "#${hex}") config.davidutz.theme.ui;
 
       # A theme in T3 Code's "seeded" form: it derives every surface from `canvas`
       # and `accent` with its own theme generator, then applies `colors` on top.
@@ -19,26 +20,26 @@
         builtins.toJSON {
           name = "Catppuccin Mocha (dotnix)";
           appearance = "dark";
-          canvas = c.base;
-          accent = c.lavender;
+          canvas = ui.background;
+          accent = ui.accent;
           colors = {
-            accentForeground = c.crust;
-            focus = c.lavender;
-            text = c.text;
+            accentForeground = ui.onAccent;
+            focus = ui.accent;
+            text = ui.foreground;
             textMuted = c.subtext0;
-            border = c.surface0;
+            border = ui.raised;
             sidebar = c.mantle;
-            sidebarForeground = c.text;
+            sidebarForeground = ui.foreground;
             sidebarMutedForeground = c.subtext0;
-            codeBackground = c.mantle;
-            codeForeground = c.text;
-            terminalBackground = c.base;
-            terminalForeground = c.text;
+            codeBackground = ui.surface;
+            codeForeground = ui.foreground;
+            terminalBackground = ui.background;
+            terminalForeground = ui.foreground;
             terminalCursor = c.rosewater;
-            terminalSelection = c.surface1;
-            error = c.red;
+            terminalSelection = ui.highlight;
+            error = ui.danger;
             warning = c.yellow;
-            update = c.green;
+            update = ui.success;
           };
         }
       );

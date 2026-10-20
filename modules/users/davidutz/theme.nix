@@ -1,15 +1,44 @@
-# One colour palette for everything (Catppuccin Mocha).
+# One colour scheme for everything: Catppuccin Mocha, laid out like Mochi's island.
 #
-# `davidutz.theme.colors` is the source. Stylix turns it into a base16 scheme and
-# themes the apps it supports (GTK, Qt, Zen, Discord, Spotify, bat, tmux, ...), with the
-# cursor, icons and fonts. Starship, Hyprland, ghostty, Mochi and the boot menu read
-# the palette by colour name. Switching the palette here switches all of them.
+# `davidutz.theme.colors` is the palette and `davidutz.theme.roles` says what each
+# colour is for (background, accent, ...), with the choices of Mochi's Catppuccin
+# preset: a crust background and a mauve accent. Mochi, Stylix's base16 scheme (GTK,
+# Qt, Zen, Discord, Spotify, bat, tmux, ...), Hyprland, Ghostty, T3 Code, Stylus and
+# the boot menu all read the roles, so changing one here changes it everywhere.
 # The palette is in the base profile, so the terminal setup has it without a desktop.
 { inputs, ... }:
 {
   flake.homeModules.davidutz =
-    { lib, ... }:
+    { config, lib, ... }:
+    let
+      cfg = config.davidutz.theme;
+    in
     {
+      # What each palette colour is for, as Mochi's theme names them. Every app
+      # reads these, so the island and the windows share a background and an
+      # accent. Values are names from `colors`.
+      options.davidutz.theme.roles = lib.mkOption {
+        type = with lib.types; attrsOf str;
+        default = {
+          background = "crust"; # windows, the island, the terminal
+          surface = "base"; # cards, sidebars, code blocks
+          raised = "surface0"; # buttons, borders, dividers
+          highlight = "surface1"; # hovered and selected things
+          foreground = "text";
+          muted = "overlay1";
+          accent = "mauve"; # what is active or important
+          onAccent = "crust"; # text on the accent
+          danger = "red";
+          success = "green";
+        };
+      };
+      options.davidutz.theme.ui = lib.mkOption {
+        type = with lib.types; attrsOf str;
+        readOnly = true;
+        default = lib.mapAttrs (_: name: cfg.colors.${name}) cfg.roles;
+        description = "The roles resolved to hex RGB without `#`.";
+      };
+
       options.davidutz.theme.colors = lib.mkOption {
         type = with lib.types; attrsOf str;
         description = "Palette as hex RGB without `#`, keyed by Catppuccin colour name.";
@@ -50,25 +79,26 @@
     { config, ... }:
     let
       c = config.hm.davidutz.theme.colors;
+      ui = config.hm.davidutz.theme.ui;
     in
     {
       boot.loader.limine.style = {
         wallpapers = [ ./desktop/wallpapers/images/seaside-sunset.jpg ];
         wallpaperStyle = "stretched";
-        backdrop = c.crust;
+        backdrop = ui.background;
         interface = {
           branding = config.networking.hostName;
-          brandingColor = c.lavender;
-          helpColor = c.overlay1;
+          brandingColor = ui.accent;
+          helpColor = ui.muted;
         };
         graphicalTerminal = {
           # Catppuccin's terminal order: black, red, green, brown, blue, magenta, cyan, gray.
           palette = "${c.surface1};${c.red};${c.green};${c.yellow};${c.blue};${c.pink};${c.teal};${c.subtext0}";
           brightPalette = "${c.surface2};${c.red};${c.green};${c.yellow};${c.blue};${c.pink};${c.teal};${c.subtext1}";
-          foreground = c.text;
-          background = "33${c.base}"; # TTRRGGBB, TT is transparency: base at 20% over the wallpaper
-          brightForeground = c.lavender;
-          brightBackground = c.surface0;
+          foreground = ui.foreground;
+          background = "33${ui.background}"; # TTRRGGBB, TT is transparency: 20% over the wallpaper
+          brightForeground = ui.accent;
+          brightBackground = ui.raised;
         };
       };
     };
@@ -77,6 +107,7 @@
     { config, pkgs, ... }:
     let
       c = config.davidutz.theme.colors;
+      inherit (config.davidutz.theme) roles ui;
     in
     {
       imports = [ inputs.stylix.homeModules.stylix ];
@@ -90,16 +121,19 @@
         # Its overlays (NixOS logo, GtkSourceView) would change nixpkgs, which the
         # home-manager NixOS module forbids with useGlobalPkgs.
         overlays.enable = false;
-        # Catppuccin's own base16 mapping.
+        # Catppuccin's base16 mapping, with the backgrounds of the roles: base00 is the
+        # window background, base01 the sidebars and panels, base02 and base03 the
+        # selections. base0D stays blue: it is the syntax colour of functions, and the
+        # accent is set per app instead (GTK below).
         base16Scheme = with c; {
           scheme = "Catppuccin Mocha (dotnix)";
           author = "Catppuccin";
-          base00 = base;
-          base01 = mantle;
-          base02 = surface0;
-          base03 = surface1;
+          base00 = ui.background;
+          base01 = ui.surface;
+          base02 = ui.raised;
+          base03 = ui.highlight;
           base04 = surface2;
-          base05 = text;
+          base05 = ui.foreground;
           base06 = rosewater;
           base07 = lavender;
           base08 = red;
@@ -121,12 +155,12 @@
           size = 32;
         };
 
-        # Papirus with its folders in the palette's lavender.
+        # Papirus with its folders in the accent (a Catppuccin colour name).
         icons = {
           enable = true;
           package = pkgs.catppuccin-papirus-folders.override {
             flavor = "mocha";
-            accent = "lavender";
+            accent = roles.accent;
           };
           dark = "Papirus-Dark";
           light = "Papirus-Light";
@@ -159,11 +193,11 @@
         targets = {
           gtk = {
             enable = true;
-            # Stylix's accent is base0D (blue); the rest of the desktop uses lavender.
+            # Stylix's accent is base0D (blue); the desktop's is the accent role.
             extraCss = ''
-              @define-color accent_color #${c.lavender};
-              @define-color accent_bg_color #${c.lavender};
-              @define-color accent_fg_color #${c.crust};
+              @define-color accent_color #${ui.accent};
+              @define-color accent_bg_color #${ui.accent};
+              @define-color accent_fg_color #${ui.onAccent};
             '';
           };
           qt.enable = true;

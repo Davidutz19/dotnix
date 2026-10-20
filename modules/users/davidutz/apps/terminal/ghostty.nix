@@ -4,6 +4,7 @@
     { config, lib, ... }:
     let
       c = config.davidutz.theme.colors;
+      ui = config.davidutz.theme.ui;
 
       # ANSI colours 0-15, in Catppuccin's order for terminals.
       ansi = [
@@ -36,13 +37,13 @@
         };
         themes.catppuccin-mocha = {
           palette = lib.imap0 (i: name: "${toString i}=#${c.${name}}") ansi;
-          background = c.base;
-          foreground = c.text;
+          background = ui.background;
+          foreground = ui.foreground;
           cursor-color = c.rosewater;
-          cursor-text = c.crust;
-          selection-background = "353749";
-          selection-foreground = c.text;
-          split-divider-color = c.surface0;
+          cursor-text = ui.background;
+          selection-background = ui.highlight;
+          selection-foreground = ui.foreground;
+          split-divider-color = ui.raised;
         };
       };
 

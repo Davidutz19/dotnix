@@ -4,6 +4,7 @@
     { config, ... }:
     let
       c = config.davidutz.theme.colors;
+      ui = config.davidutz.theme.ui;
     in
     {
       wayland.windowManager.hyprland.extraConfig = ''
@@ -13,8 +14,8 @@
             gaps_out = 20,
             border_size = 2,
             col = {
-              active_border = { colors = { "rgb(${c.lavender})", "rgb(${c.blue})" }, angle = 45 },
-              inactive_border = "rgb(${c.base})",
+              active_border = { colors = { "rgb(${ui.accent})", "rgb(${c.blue})" }, angle = 45 },
+              inactive_border = "rgb(${ui.surface})",
             },
             resize_on_border = false,
             -- See https://wiki.hypr.land/Configuring/Advanced-and-Cool/Tearing/ first.

@@ -10,7 +10,10 @@
   flake.nixosModules.davidutz.security.pam.services.mochi = { };
 
   flake.homeModules.davidutzDesktop =
-    { pkgs, ... }:
+    { config, pkgs, ... }:
+    let
+      ui = config.davidutz.theme.ui;
+    in
     {
       imports = [ inputs.mochi.homeModules.default ];
 
@@ -102,9 +105,22 @@
             "timer"
           ];
         };
+        # The roles from theme.nix, which are those of Mochi's Catppuccin preset.
+        # The island's background is 96% opaque (f5).
         theme = {
-          preset = "catppuccin";
-          text.family = "JetBrainsMono Nerd Font";
+          colors = {
+            background = "#f5${ui.background}";
+            surface = "#${ui.surface}";
+            raised = "#${ui.raised}";
+            highlight = "#${ui.highlight}";
+            foreground = "#${ui.foreground}";
+            muted = "#${ui.muted}";
+            accent = "#${ui.accent}";
+            on_accent = "#${ui.onAccent}";
+            danger = "#${ui.danger}";
+            success = "#${ui.success}";
+          };
+          text.family = config.stylix.fonts.monospace.name;
         };
       };
 
