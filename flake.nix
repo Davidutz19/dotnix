@@ -57,6 +57,14 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Mochi plugin: the wallpaper picker (users/davidutz/desktop/wallpapers). A local
+    # checkout while it is developed; `nix flake update mochi-wallpaper-selector`
+    # takes its latest commit.
+    mochi-wallpaper-selector = {
+      url = "git+file:///home/davidutz/personal/mochi-wallpaper-selector";
+      flake = false;
+    };
+
     # Declarative Flatpak apps and remotes (Sober).
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
 

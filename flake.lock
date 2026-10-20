@@ -269,6 +269,22 @@
         "type": "github"
       }
     },
+    "mochi-wallpaper-selector": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792491594,
+        "narHash": "sha256-ExCdbX/IpXBLF2zSDP38bSsln4M9wm6ET2TtfjpbFCk=",
+        "ref": "refs/heads/main",
+        "rev": "9db1131d9ab4bc9b1db758a949f727204a00c60d",
+        "revCount": 2,
+        "type": "git",
+        "url": "file:///home/davidutz/personal/mochi-wallpaper-selector"
+      },
+      "original": {
+        "type": "git",
+        "url": "file:///home/davidutz/personal/mochi-wallpaper-selector"
+      }
+    },
     "nix-flatpak": {
       "locked": {
         "lastModified": 1790428548,
@@ -434,6 +450,7 @@
         "home-manager": "home-manager",
         "import-tree": "import-tree",
         "mochi": "mochi",
+        "mochi-wallpaper-selector": "mochi-wallpaper-selector",
         "nix-flatpak": "nix-flatpak",
         "nixcord": "nixcord",
         "nixpkgs": "nixpkgs_2",
