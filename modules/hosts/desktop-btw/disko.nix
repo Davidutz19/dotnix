@@ -1,6 +1,7 @@
 # Disk layout of desktop-btw. The boot-time wipe of `/` is in system/impermanence.nix.
 #
-#   system  Phison E12 512G   ESP + btrfs:  @ (/ and /home, wiped every boot)  @nix  @persist
+#   system  Phison E12 512G   ESP + LUKS2 (cryptroot) holding btrfs:
+#                                           @ (/ and /home, wiped every boot)  @nix  @persist
 #   data    WD SN7100 2TB     one btrfs:    top level at /mnt/bulkfast, each former
 #                                           folder is now a subvolume with the same name
 #
@@ -48,20 +49,31 @@ in
           root = {
             uuid = "205bd0a2-e61a-451d-84c3-2696a7a1e0f6";
             size = "100%";
+            # LUKS2, unlocked by the TPM with a PIN (systemd-cryptenroll), or the
+            # recovery key. The TPM only releases the key if PCR 7 matches: Secure Boot
+            # on, and Limine signed with our key (system/boot.nix).
             content = {
-              type = "btrfs";
-              subvolumes = {
-                "@" = {
-                  mountpoint = "/";
-                  mountOptions = btrfsOpts;
-                };
-                "@nix" = {
-                  mountpoint = "/nix";
-                  mountOptions = btrfsOpts;
-                };
-                "@persist" = {
-                  mountpoint = "/persist";
-                  mountOptions = btrfsOpts;
+              type = "luks";
+              name = "cryptroot";
+              settings = {
+                allowDiscards = true; # TRIM; reveals which blocks are free
+                crypttabExtraOpts = [ "tpm2-device=auto" ];
+              };
+              content = {
+                type = "btrfs";
+                subvolumes = {
+                  "@" = {
+                    mountpoint = "/";
+                    mountOptions = btrfsOpts;
+                  };
+                  "@nix" = {
+                    mountpoint = "/nix";
+                    mountOptions = btrfsOpts;
+                  };
+                  "@persist" = {
+                    mountpoint = "/persist";
+                    mountOptions = btrfsOpts;
+                  };
                 };
               };
             };

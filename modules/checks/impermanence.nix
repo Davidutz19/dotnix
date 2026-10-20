@@ -2,9 +2,9 @@
 # (shrunk ESP: the test disks are 4 GiB). Runs with `nix flake check` and needs KVM.
 #
 # It checks that disko's format step is idempotent (disko's own test harness formats
-# twice), that `/` and /home are empty after a reboot, and that /persist, the
-# machine-id, the SSH host key, the preserved home paths and the data disk mounts
-# inside the home survive it.
+# twice), that the root opens from LUKS, that `/` and /home are empty after a reboot,
+# and that /persist, the machine-id, the SSH host key, the preserved home paths and
+# the data disk mounts inside the home survive it.
 { self, inputs, ... }:
 {
   perSystem =
@@ -20,7 +20,12 @@
           inherit pkgs;
           name = "impermanence";
           disko-config = lib.recursiveUpdate self.diskoConfigurations.desktop-btw {
-            disko.devices.disk.system.content.partitions.ESP.size = "512M";
+            disko.devices.disk.system.content.partitions = {
+              ESP.size = "512M";
+              # The test VM has no TPM: the root opens with the key file disko's test
+              # harness writes (/tmp/secret.key).
+              root.content.settings.keyFile = "/tmp/secret.key";
+            };
           };
           extraSystemConfig = {
             imports = [ self.nixosModules.impermanence ];
@@ -55,6 +60,7 @@
             machine.wait_for_unit("multi-user.target")
             machine.wait_for_unit("sshd.service")
             no_failed_units()
+            machine.succeed("test \"$(findmnt -no SOURCE /persist | cut -d[ -f1)\" = /dev/mapper/cryptroot")
 
             # state written during the first boot
             machine.succeed("test -L /etc/machine-id")
