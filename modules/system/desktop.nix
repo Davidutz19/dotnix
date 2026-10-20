@@ -19,8 +19,11 @@
     services.sunshine = {
       enable = true;
       autoStart = true;
-      capSysAdmin = true; # KMS capture
       openFirewall = true;
+      # Capture through Hyprland's screencopy protocol. Left unset, Sunshine first asks the
+      # desktop portal for screens at every login, which opens the screen-share picker.
+      # Any setting here makes the web UI's configuration page read-only.
+      settings.capture = "wlr";
     };
 
     hm.davidutz.persist.directories = [
