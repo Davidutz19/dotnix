@@ -1,8 +1,11 @@
-# One colour palette for everything (Catppuccin Mocha), plus GTK, icons, Qt and the boot menu.
+# One colour palette for everything (Catppuccin Mocha).
 #
-# Starship, Hyprland, ghostty, Mochi and GTK read their colours from
-# `davidutz.theme.colors`, so switching the palette here switches all of them.
+# `davidutz.theme.colors` is the source. Stylix turns it into a base16 scheme and
+# themes the apps it supports (GTK, Qt, Zen, bat, btop, tmux, ...), with the
+# cursor, icons and fonts. Starship, Hyprland, ghostty, Mochi and the boot menu read
+# the palette by colour name. Switching the palette here switches all of them.
 # The palette is in the base profile, so the terminal setup has it without a desktop.
+{ inputs, ... }:
 {
   flake.homeModules.davidutz =
     { lib, ... }:
@@ -71,109 +74,125 @@
     };
 
   flake.homeModules.davidutzDesktop =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
+    { config, pkgs, ... }:
     let
       c = config.davidutz.theme.colors;
-
-      # libadwaita's named colours, from the palette. GTK4 apps (libadwaita) and GTK3
-      # apps (adw-gtk3) both draw with these names, so one table recolours both.
-      # https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/css-variables.html
-      named = {
-        accent_color = c.lavender;
-        accent_bg_color = c.lavender;
-        accent_fg_color = c.crust;
-        destructive_color = c.red;
-        destructive_bg_color = c.red;
-        destructive_fg_color = c.crust;
-        success_color = c.green;
-        success_bg_color = c.green;
-        success_fg_color = c.crust;
-        warning_color = c.yellow;
-        warning_bg_color = c.yellow;
-        warning_fg_color = c.crust;
-        error_color = c.red;
-        error_bg_color = c.red;
-        error_fg_color = c.crust;
-        window_bg_color = c.base;
-        window_fg_color = c.text;
-        view_bg_color = c.base;
-        view_fg_color = c.text;
-        headerbar_bg_color = c.base;
-        headerbar_fg_color = c.text;
-        headerbar_backdrop_color = c.base;
-        sidebar_bg_color = c.mantle;
-        sidebar_fg_color = c.text;
-        sidebar_backdrop_color = c.mantle;
-        secondary_sidebar_bg_color = c.mantle;
-        secondary_sidebar_fg_color = c.text;
-        card_bg_color = c.surface0;
-        card_fg_color = c.text;
-        dialog_bg_color = c.mantle;
-        dialog_fg_color = c.text;
-        popover_bg_color = c.mantle;
-        popover_fg_color = c.text;
-        thumbnail_bg_color = c.surface0;
-        thumbnail_fg_color = c.text;
-      };
-      # GTK4: CSS variables (libadwaita 1.6+). GTK3: @define-color.
-      gtk4Css = ":root {\n${
-        lib.concatStrings (
-          lib.mapAttrsToList (n: v: "  --${lib.replaceStrings [ "_" ] [ "-" ] n}: #${v};\n") named
-        )
-      }}\n";
-      gtk3Css = lib.concatStrings (lib.mapAttrsToList (n: v: "@define-color ${n} #${v};\n") named);
     in
     {
-      # The light variant is the white cursor, which stays visible on the dark palette.
-      # `gtk.enable` fills in `gtk.cursorTheme`. Hyprland reads the same name and size
-      # for its session env vars, see desktop/hyprland/hyprland.nix.
-      home.pointerCursor = {
-        enable = true;
-        name = "phinger-cursors-light";
-        package = pkgs.phinger-cursors;
-        size = 32;
-        gtk.enable = true;
-      };
+      imports = [ inputs.stylix.homeModules.stylix ];
 
-      # colorScheme sets org.gnome.desktop.interface color-scheme = prefer-dark, which
-      # the GTK portal hands to libadwaita, Firefox/Zen, Chromium and Electron apps.
-      gtk = {
+      # Stylix themes the apps enabled in `targets` below from the same palette, and
+      # sets the cursor, icons and fonts. Other apps it supports: `ls` the modules/
+      # folder of the stylix input, then add `<name>.enable = true`.
+      stylix = {
         enable = true;
-        colorScheme = "dark";
-        # GTK3 apps ignore color-scheme and need a dark theme. GTK4 has no theme,
-        # only libadwaita's colours, which gtk.css overrides with the palette.
-        theme = {
-          name = "adw-gtk3-dark";
-          package = pkgs.adw-gtk3;
+        polarity = "dark";
+        # Its overlays (NixOS logo, GtkSourceView) would change nixpkgs, which the
+        # home-manager NixOS module forbids with useGlobalPkgs.
+        overlays.enable = false;
+        # Catppuccin's own base16 mapping.
+        base16Scheme = with c; {
+          base00 = base;
+          base01 = mantle;
+          base02 = surface0;
+          base03 = surface1;
+          base04 = surface2;
+          base05 = text;
+          base06 = rosewater;
+          base07 = lavender;
+          base08 = red;
+          base09 = peach;
+          base0A = yellow;
+          base0B = green;
+          base0C = teal;
+          base0D = blue;
+          base0E = mauve;
+          base0F = flamingo;
         };
-        gtk3.extraCss = gtk3Css;
-        gtk4.theme = null;
-        gtk4.extraCss = gtk4Css;
+
+        # The light variant is the white cursor, which stays visible on the dark
+        # palette. Hyprland reads its name and size from home.pointerCursor
+        # (desktop/hyprland/hyprland.nix).
+        cursor = {
+          name = "phinger-cursors-light";
+          package = pkgs.phinger-cursors;
+          size = 32;
+        };
+
         # Papirus with its folders in the palette's lavender.
-        iconTheme = {
-          name = "Papirus-Dark";
+        icons = {
+          enable = true;
           package = pkgs.catppuccin-papirus-folders.override {
             flavor = "mocha";
             accent = "lavender";
           };
+          dark = "Papirus-Dark";
+          light = "Papirus-Light";
+        };
+
+        # The packages are installed system-wide (system/hyprland.nix).
+        fonts = {
+          monospace = {
+            name = "JetBrainsMono Nerd Font";
+            package = pkgs.nerd-fonts.jetbrains-mono;
+          };
+          sansSerif = {
+            name = "Noto Sans";
+            package = pkgs.noto-fonts;
+          };
+          serif = {
+            name = "Noto Serif";
+            package = pkgs.noto-fonts;
+          };
+          emoji = {
+            name = "Noto Color Emoji";
+            package = pkgs.noto-fonts-color-emoji;
+          };
+          sizes.applications = 11;
+        };
+
+        # Only the apps listed here. Left on, autoEnable writes config for every app
+        # Stylix knows (Blender, Vencord, ...) and takes over VSCodium's settings.json.
+        autoEnable = false;
+        targets = {
+          gtk = {
+            enable = true;
+            # Stylix's accent is base0D (blue); the rest of the desktop uses lavender.
+            extraCss = ''
+              @define-color accent_color #${c.lavender};
+              @define-color accent_bg_color #${c.lavender};
+              @define-color accent_fg_color #${c.crust};
+            '';
+          };
+          qt.enable = true;
+          zen-browser = {
+            enable = true;
+            profileNames = [ "default" ];
+          };
+          fontconfig.enable = true;
+          bat.enable = true;
+          btop.enable = true;
+          lazygit.enable = true;
+          tmux.enable = true;
+          # Its font only: apps/terminal/ghostty.nix has Catppuccin's own ANSI colours.
+          ghostty = {
+            enable = true;
+            colors.enable = false;
+          };
+          # Not here, drawn by hand from the palette instead: Hyprland's gradient
+          # border (hyprland/appearance.nix) and the prompt (shell/starship.nix).
+          # VSCodium keeps the official Catppuccin theme extension.
         };
       };
+
+      # colorScheme sets org.gnome.desktop.interface color-scheme = prefer-dark, which
+      # the GTK portal hands to libadwaita, Firefox/Zen, Chromium and Electron apps.
+      gtk.colorScheme = "dark";
 
       # GTK settings GUI.
       home.packages = [ pkgs.nwg-look ];
       wayland.windowManager.hyprland.extraConfig = ''
         hl.bind("SUPER + comma", hl.dsp.exec_cmd("nwg-look"))
       '';
-
-      qt = {
-        enable = true;
-        platformTheme.name = "adwaita";
-        style.name = "adwaita-dark";
-      };
     };
 }

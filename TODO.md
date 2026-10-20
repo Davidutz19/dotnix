@@ -36,8 +36,6 @@ Open work only. The layout and commands are in README.md.
 
 - [ ] ssh-agent with the 30-minute key timeout: `services.ssh-agent.enable = true;`
       (Mochi already provides `SSH_ASKPASS`).
-- [ ] Qt: qt5ct/qt6ct with Catppuccin Mocha Lavender. Conflicts with
-      `qt.platformTheme.name = "adwaita"` in `theme.nix`; decide with Theming below.
 - [ ] Zen's `.zen-chrome/*.css`: `programs.zen-browser.profiles.default.userChrome`
       and `userContent`.
 - [ ] wepapered and nekoland: not packaged. Package them, then give each an `apps/` file.
@@ -83,11 +81,6 @@ Open work only. The layout and commands are in README.md.
       toolchains. Global ones CachyOS had: go, dotnet-sdk, php + composer, python + uv,
       nodejs + pnpm + bun, rustup, cmake, opentofu, kubectl, ansible.
 - [ ] VSCodium extensions through `programs.vscode.profiles.default.extensions`.
-
-## Theming
-
-- [ ] Catppuccin for GTK, Qt and terminal apps in one place: https://github.com/catppuccin/nix
-- [ ] Papirus folders in the Catppuccin colour.
 
 ## Repo
 

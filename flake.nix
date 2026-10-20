@@ -33,6 +33,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Theming for every app it knows, from the palette in users/davidutz/theme.nix.
+    stylix = {
+      url = "github:nix-community/stylix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
+    };
+
     # Declarative Flatpak apps and remotes (Sober).
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
 
