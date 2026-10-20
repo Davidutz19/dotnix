@@ -272,11 +272,11 @@
     "mochi-wallpaper-selector": {
       "flake": false,
       "locked": {
-        "lastModified": 1792491824,
-        "narHash": "sha256-p8IexIeSPwIsVgIDbvscS2qH7gt47oN+57IAyOzT8sY=",
+        "lastModified": 1792492110,
+        "narHash": "sha256-lUKSybdAzcn1A2/9TyUpBrLC2pUWnIjg/cTQIgEkRaI=",
         "ref": "refs/heads/main",
-        "rev": "ef0dbd65d8d613b84ee7859be2c5de74777cb92e",
-        "revCount": 3,
+        "rev": "d53d742ca3ed1904a72d67134d71a74996b273f5",
+        "revCount": 4,
         "type": "git",
         "url": "file:///home/davidutz/personal/mochi-wallpaper-selector"
       },
