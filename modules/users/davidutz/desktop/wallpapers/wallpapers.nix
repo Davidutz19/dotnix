@@ -42,9 +42,9 @@
       ) wallhaven;
 
       programs.mochi = {
-        plugins.wallpaper.src = inputs.mochi-wallpaper-selector;
-        settings.modules = [ "wallpaper" ];
-        settings.module.wallpaper = {
+        plugins.wallpaper-selector.src = inputs.mochi-wallpaper-selector;
+        settings.modules = [ "wallpaper-selector" ];
+        settings.module.wallpaper-selector = {
           daemon = "awww";
           transition = "grow";
           # Until one is picked; after that, the last one picked.
@@ -53,10 +53,10 @@
       };
 
       # The wallpaper picked last.
-      davidutz.persist.directories = [ ".local/state/mochi-wallpaper" ];
+      davidutz.persist.directories = [ ".local/state/mochi-wallpaper-selector" ];
 
       wayland.windowManager.hyprland.extraConfig = ''
-        hl.bind("SUPER + CTRL + W", hl.dsp.exec_cmd("mochi ipc wallpaper toggle"))
+        hl.bind("SUPER + CTRL + W", hl.dsp.exec_cmd("mochi ipc wallpaper-selector toggle"))
       '';
     };
 }
