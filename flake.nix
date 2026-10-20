@@ -40,6 +40,23 @@
       inputs.flake-parts.follows = "flake-parts";
     };
 
+    # Discord with Equicord, configured declaratively (plugins, themes).
+    nixcord = {
+      url = "github:FlameFlag/nixcord";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs-packages.follows = "nixpkgs";
+      inputs.nixpkgs-ci.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+      # Only its own tests use these.
+      inputs.nix-darwin.follows = "";
+      inputs.treefmt-nix.follows = "";
+    };
+    # Spotify with Spicetify (themes, extensions).
+    spicetify-nix = {
+      url = "github:Gerg-L/spicetify-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Declarative Flatpak apps and remotes (Sober).
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
 

@@ -1,7 +1,7 @@
 # One colour palette for everything (Catppuccin Mocha).
 #
 # `davidutz.theme.colors` is the source. Stylix turns it into a base16 scheme and
-# themes the apps it supports (GTK, Qt, Zen, bat, btop, tmux, ...), with the
+# themes the apps it supports (GTK, Qt, Zen, Discord, Spotify, bat, tmux, ...), with the
 # cursor, icons and fonts. Starship, Hyprland, ghostty, Mochi and the boot menu read
 # the palette by colour name. Switching the palette here switches all of them.
 # The palette is in the base profile, so the terminal setup has it without a desktop.
@@ -174,6 +174,8 @@
           btop.enable = true;
           lazygit.enable = true;
           tmux.enable = true;
+          nixcord.enable = true; # Equicord, apps/chat/discord.nix
+          spicetify.enable = true; # apps/media/spotify.nix
           # Its font only: apps/terminal/ghostty.nix has Catppuccin's own ANSI colours.
           ghostty = {
             enable = true;

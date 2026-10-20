@@ -93,7 +93,7 @@
       davidutz.persist.directories = [ ".config/zen" ];
 
       wayland.windowManager.hyprland.extraConfig = ''
-        hl.bind("SUPER + B", hl.dsp.exec_cmd("zen-beta"))
+        hl.bind("SUPER + SHIFT + B", hl.dsp.exec_cmd("zen-beta"))
       '';
 
       programs.zen-browser = {

@@ -11,6 +11,10 @@
 # it over the old one fails with EBUSY. Put such state in a preserved directory instead
 # (zsh's history is in ~/.local/share/zsh for that reason).
 #
+# A newly listed path is mounted during the switch that adds it, possibly after
+# home-manager wrote its files there, which the mount then hides. Run
+# `systemctl restart home-manager-davidutz` once, or reboot.
+#
 # Something lost its settings after a reboot? Find where it writes
 # (`find ~ -xdev -newer /etc/os-release -not -path '*/.cache/*'`) and list the path in
 # the file that configures it. Machines without impermanence ignore the list.
