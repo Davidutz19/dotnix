@@ -92,6 +92,8 @@
         overlays.enable = false;
         # Catppuccin's own base16 mapping.
         base16Scheme = with c; {
+          scheme = "Catppuccin Mocha (dotnix)";
+          author = "Catppuccin";
           base00 = base;
           base01 = mantle;
           base02 = surface0;

@@ -1,6 +1,11 @@
 { inputs, ... }: {
   flake.homeModules.davidutzDesktop =
-    { pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       # The overlay builds addons with our pkgs, so nixpkgs.config.allowUnfree reaches
       # unfree ones like keepa; the flake's `packages` use its own nixpkgs and refuse them.
@@ -63,6 +68,13 @@
           sha256 = "sha256-DEQ+nQTkWLN1QDVkG5p6rKhSAn0E+YFe1IlaePLmN2U=";
         })
         (amo {
+          pname = "hide-youtube-thumbnails";
+          version = "2.6.3";
+          addonId = "{17c4514d-71fa-4633-8c07-1fe0b354c885}";
+          file = "4695827/hide_youtube_thumbnails-2.6.3.xpi";
+          sha256 = "sha256-eWYAckcqMast/4uqDE2Su57NkDLe/x5VXE3jXe48DaM=";
+        })
+        (amo {
           pname = "twitch-ad-blocker";
           version = "1.0.1";
           addonId = "{25d049c4-af50-480c-bea8-09fc8bcc5323}";
@@ -86,6 +98,63 @@
           meta = { };
         })
       ];
+
+      # Firefox Color (the browser extension Stylix uses for Firefox) with the palette.
+      # Stylix's mapping, with lavender (base07) wherever it uses blue (base0D), to
+      # match the accent of the rest of the desktop.
+      firefoxColor =
+        let
+          s = config.lib.stylix.colors;
+          rgb = base: {
+            r = s."${base}-rgb-r";
+            g = s."${base}-rgb-g";
+            b = s."${base}-rgb-b";
+          };
+        in
+        {
+          firstRunDone = true;
+          theme = {
+            title = "Stylix ${s.description}";
+            images.additional_backgrounds = [ "./bg-000.svg" ];
+            colors = lib.mapAttrs (_: rgb) {
+              toolbar = "base00";
+              toolbar_text = "base05";
+              frame = "base01";
+              frame_inactive = "base00";
+              tab_background_text = "base05";
+              tab_background_separator = "base07";
+              tab_line = "base07";
+              tab_loading = "base05";
+              tab_selected = "base00";
+              tab_text = "base05";
+              toolbar_field = "base02";
+              toolbar_field_text = "base05";
+              toolbar_field_border = "base00";
+              toolbar_field_border_focus = "base07";
+              toolbar_field_focus = "base00";
+              toolbar_field_highlight = "base07";
+              toolbar_field_highlight_text = "base00";
+              toolbar_field_separator = "base07";
+              toolbar_bottom_separator = "base00";
+              toolbar_vertical_separator = "base07";
+              popup = "base00";
+              popup_text = "base05";
+              popup_border = "base07";
+              popup_highlight = "base04";
+              popup_highlight_text = "base05";
+              sidebar = "base00";
+              sidebar_text = "base05";
+              sidebar_border = "base07";
+              sidebar_highlight = "base07";
+              sidebar_highlight_text = "base05";
+              button_background_active = "base04";
+              icons = "base05";
+              icons_attention = "base07";
+              ntp_background = "base00";
+              ntp_text = "base05";
+            };
+          };
+        };
     in
     {
       imports = [ inputs.zen-browser.homeModules.beta ];
@@ -120,8 +189,13 @@
               csgofloat
               video-downloadhelper
               aw-watcher-web
+              firefox-color
             ]
             ++ extra;
+          # Required before home-manager writes an extension's settings. It only
+          # replaces the settings of the extensions listed here.
+          extensions.force = true;
+          extensions.settings."FirefoxColor@mozilla.com".settings = firefoxColor;
           settings = {
             "browser.tabs.warnOnClose" = false;
           };
